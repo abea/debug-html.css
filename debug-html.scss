@@ -1,0 +1,75 @@
+//
+// CSS to debug HTML mistakes
+// Based on article "Linting HTML using CSS" by Ire Aderinokun
+// https://bitsofco.de/linting-html-using-css/
+//
+
+$danger-color: #f00;
+$warning-color: #ffd801;
+
+@mixin debug($color: $danger-color) {
+  outline: .25rem solid $color;
+}
+
+@mixin debug-meta() {
+  // To make meta tags visible.
+  @include debug;
+  display: block;
+  background-color: lighten($danger-color, 50%);
+  padding: 1rem;
+}
+
+
+// Inline styles
+*[style] { @include debug; }
+
+// Faulty or missing link targets
+a:not([href])
+a:[href="#"],
+a:[href=""],
+a[href*="javascript:void(0)"] { @include debug; }
+
+// Unaccessible images
+img:not([alt]) { @include debug; }
+// Blank alt attribute
+img[alt=""] { @include debug($warning-color); }
+
+// Missing document language
+html:not([lang]),
+html[lang=""] {
+  border: .25rem dashed $danger-color;
+}
+
+// Make `head` tag visible for meta tag debugging
+head { display: block; }
+// Incorrect character set
+meta[charset]:not([charset="UTF-8"]) { @include debug-meta; }
+// Meta tag not first in `head`
+meta[charset="UTF-8"]:not(:first-child) { @include debug-meta; }
+// Unaccessible viewport attributes
+meta[name="viewport"][content*="user-scalable=no"],
+meta[name="viewport"][content*="maximum-scale"],
+meta[name="viewport"][content*="minimum-scale"] { @include debug-meta; }
+
+// Potentially unlabled input fields
+input:not([id]),
+select:not([id]),
+textarea:not([id]) { @include debug($warning-color); }
+
+label:not([for]) { @include debug($warning-color); }
+
+// Input fields without data `name` attribute
+input:not([name]),
+select:not([name]),
+textarea:not([name]) { @include debug($warning-color); }
+
+// Unnamed form
+form:not([name]):not([id]) { @include debug($warning-color); }
+
+// Empty interactive elements (no content)
+button:empty,
+a:empty { @include debug($warning-color); }
+
+// Unnecessary or deprecated attributes
+script[type="text/javascript"],
+link[rel="stylesheet"][type="text/css"] { @include debug($warning-color); }
